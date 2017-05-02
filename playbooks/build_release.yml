@@ -1,0 +1,59 @@
+---
+- hosts: "{{ host }}"
+  become: yes
+  gather_facts: no
+  vars:
+    - base_dir: "{{ project_dir }}"
+  vars_files:
+   - vars/postgres_prod.yml
+  tasks:
+    - name: Fetch Hex
+      shell: mix local.hex --force
+      args:
+        chdir: "{{ base_dir }}"
+
+    - name: Fetch Rebar
+      shell: mix local.rebar --force
+      args:
+        chdir: "{{ base_dir }}"
+
+    - name: Compile the app
+      shell: mix compile
+      args:
+        chdir: "{{ base_dir }}"
+
+    - name: Install node dependencies
+      shell: npm install --no-bin-links
+      args:
+        chdir: "{{ base_dir }}/apps/{{ app }}"
+
+    - name: Build assets
+      shell: >
+        MIX_ENV=prod mix phoenix.digest
+      args:
+        chdir: "{{ base_dir }}/apps/{{ app }}"
+      become: no
+
+    - name: Build production release for app
+      shell: >
+        MIX_ENV=prod
+        DB_NAME={{ dbname }}
+        DB_USER={{ dbuser }}
+        DB_PASSWORD={{ dbpassword }}
+        DB_HOST={{ dbhost }}
+        mix release --env=prod --name={{ app }}
+      args:
+        chdir: "{{ base_dir }}"
+
+    - name: Remove old release from synced release folder
+      file:
+        path: /vagrant/releases/{{ app }}.tar.gz
+        state: absent
+
+    - name: Copy release to synced release folder
+      shell: >
+        cp
+        _build/prod/rel/{{ app }}/releases/0.1.0/{{ app }}.tar.gz
+        /vagrant/releases/
+      args:
+        chdir: "{{ base_dir }}"

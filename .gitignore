@@ -1,0 +1,19 @@
+.vagrant
+
+### Terraform ###
+*.terraform
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+### Ansible ###
+# Ansible retry files
+*.retry
+releases
+
+### AWS ###
+.aws_user_credentials
+
+
+
+

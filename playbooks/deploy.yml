@@ -1,0 +1,19 @@
+---
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+    - name: Copy release to production server
+      copy:
+        src: ../releases/{{ app }}.tar.gz
+        dest: /home/ubuntu
+        owner: ubuntu
+        mode: 0644
+
+    - name: Unpack release
+      shell: tar -xzf {{ app }}.tar.gz
+
+    - name: Run migrations
+      shell: bin/{{ app }} command release_tasks migrate
+
+    - name: Start the app
+      shell: bin/{{ app }} start

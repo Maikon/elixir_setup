@@ -1,0 +1,6 @@
+[elixir-conf-eu-vagrant]
+192.168.60.4 ansible_ssh_pass=vagrant ansible_ssh_user=vagrant
+
+[elixir-conf-eu-aws]
+<ec2-public-ip> ansible_user=ubuntu ansible_ssh_private_key_file=elixir-conf-eu-key.pem
+

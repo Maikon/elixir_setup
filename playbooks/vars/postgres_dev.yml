@@ -1,0 +1,3 @@
+dbuser: "postgres"
+dbname: "db_service_dev"
+dbpassword: "password"

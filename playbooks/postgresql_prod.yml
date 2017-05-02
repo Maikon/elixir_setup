@@ -1,0 +1,24 @@
+---
+- hosts: "{{ host }}"
+  become: yes
+  gather_facts: no
+  vars_files:
+   - vars/postgres_prod.yml
+
+  roles:
+   - role: ANXS.postgresql
+     ansible_ssh_pipelining: true
+     ansible_pkg_mgr: "apt"
+     postgresql_apt_repository: "deb https://apt.postgresql.org/pub/repos/apt trusty-pgdg main"
+     ansible_os_family: "Debian"
+     postgresql_databases:
+       - name: "{{ dbname }}"
+         owner: "{{ dbuser }}"
+     postgresql_users:
+       - name: "{{ dbuser }}"
+         pass: "{{ dbpassword }}"
+     postgresql_user_privileges:
+       - name: "{{ dbuser }}"
+         db: "{{ dbname }}"
+         priv: "ALL"
+         role_attr_flags: "CREATEDB"
